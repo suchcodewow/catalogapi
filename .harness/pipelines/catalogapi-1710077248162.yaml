@@ -26,7 +26,7 @@ pipeline:
                     settings:
                       dry_run: "true"
                       password: <+input>
-                      repo: hello/world
+                      repo: suchcodewow/catalogapi
                       tags: latest
                       username: <+input>
                   timeout: ""
