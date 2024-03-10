@@ -1,0 +1,82 @@
+pipeline:
+  identifier: Build_suchcodewow_catalogapi_1710077249737
+  name: Build catalogapi
+  orgIdentifier: default
+  projectIdentifier: catalogapi
+  properties:
+    ci:
+      codebase:
+        build: <+input>
+        connectorRef: account.Github_OAuth_1709938520408
+        repoName: suchcodewow/catalogapi
+  stages:
+    - stage:
+        identifier: build
+        name: build
+        spec:
+          cloneCodebase: true
+          execution:
+            steps:
+              - step:
+                  type: BuildAndPushDockerRegistry
+                  identifier: Build_and_push_to_Docker
+                  name: Build and push to Docker
+                  spec:
+                    connectorRef: HockerConnectorAgainWhy
+                    repo: suchcodewow/catalogapi
+                    tags:
+                      - <+pipeline.sequenceId>
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+        type: CI
+    - stage:
+        name: catalogapideploy
+        identifier: catalogapideploy
+        description: ""
+        type: Deployment
+        spec:
+          deploymentType: Kubernetes
+          service:
+            serviceRef: catalogapiDeploy
+            serviceInputs:
+              serviceDefinition:
+                type: Kubernetes
+                spec:
+                  artifacts:
+                    primary:
+                      primaryArtifactRef: <+input>
+                      sources: <+input>
+          environment:
+            environmentRef: catalogapiEnv
+            deployToAll: false
+            infrastructureDefinitions:
+              - identifier: catalogApipreprodinfra
+          execution:
+            steps:
+              - step:
+                  name: Rollout Deployment
+                  identifier: rolloutDeployment
+                  type: K8sRollingDeploy
+                  timeout: 10m
+                  spec:
+                    skipDryRun: false
+                    pruningEnabled: false
+            rollbackSteps:
+              - step:
+                  name: Rollback Rollout Deployment
+                  identifier: rollbackRolloutDeployment
+                  type: K8sRollingRollback
+                  timeout: 10m
+                  spec:
+                    pruningEnabled: false
+        tags: {}
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: StageRollback

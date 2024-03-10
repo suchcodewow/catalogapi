@@ -1,0 +1,14 @@
+inputSet:
+  name: Build_suchcodewow_catalogapi_1710077249737-pr-trigger-input-set
+  identifier: Build_suchcodewow_catalogapi_1710077249737prtriggerinputset
+  orgIdentifier: default
+  projectIdentifier: catalogapi
+  pipeline:
+    identifier: Build_suchcodewow_catalogapi_1710077249737
+    properties:
+      ci:
+        codebase:
+          build:
+            type: PR
+            spec:
+              number: <+trigger.prNumber>
