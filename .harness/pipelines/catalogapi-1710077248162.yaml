@@ -18,19 +18,14 @@ pipeline:
           execution:
             steps:
               - step:
-                  identifier: dockerbuild
-                  name: docker_build
+                  type: BuildAndPushDockerRegistry
+                  identifier: Build_and_push_to_Docker
+                  name: Build and push to Docker
                   spec:
                     connectorRef: account.harnessImage
-                    image: plugins/docker
-                    settings:
-                      dry_run: "true"
-                      password: <+input>
-                      repo: suchcodewow/catalogapi
-                      tags: latest
-                      username: <+input>
-                  timeout: ""
-                  type: Plugin
+                    repo: suchcodewow/catalogapi
+                    tags:
+                      - <+pipeline.sequenceId>
           platform:
             os: Linux
             arch: Amd64
